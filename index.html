@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>СКАМ БАНК – Ваша фінансова могила</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #111; 
+      color: #eee; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
+    header { 
+      background: #ff0000; 
+      padding: 20px; 
+      text-align: center; 
+      color: #fff; 
+      font-size: 20px;
+      text-transform: uppercase;
+    }
+
+    .menu-btn {
+    position: fixed;
+    top: 0px;
+    right: 10px;
+    background: #ff0000;
+    color: #fff;
+    padding: 5px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+    
+    .menu-btn:hover {
+      background: #cc0000;
+    }
+
+    .sidebar { 
+      position: fixed; 
+      top: 0; 
+      right: -250px; 
+      width: 250px; 
+      height: 100%; 
+      background: #222; 
+      color: #fff; 
+      padding: 20px; 
+      transition: 0.3s; 
+      box-shadow: -5px 0 10px rgba(255, 0, 0, 0.5);
+    }
+
+    .sidebar.active { right: 0; }
+    
+    .sidebar button { 
+      background: #ff0000; 
+      color: #fff; 
+      border: none; 
+      padding: 10px; 
+      width: 100%; 
+      margin-top: 10px; 
+      cursor: pointer; 
+      border-radius: 5px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    
+    .sidebar button:hover {
+      background: #cc0000;
+      transform: scale(1.05);
+    }
+
+    .tab-content { 
+      display: none; 
+      padding: 20px; 
+      max-width: 800px; 
+      margin: 20px auto; 
+      background: #222; 
+      border-radius: 8px; 
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    }
+
+    .tab-content.active { display: block; }
+
+    input, button { 
+      display: block; 
+      margin: 10px 0; 
+      padding: 10px; 
+      width: 100%; 
+      background: #333; 
+      color: #ff4c4c; 
+      border: 1px solid #ff4c4c; 
+      border-radius: 5px; 
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    input:focus, button:hover { 
+      background: #444; 
+      color: #fff; 
+      border-color: #ff0000;
+      transform: scale(1.05);
+    }
+
+    footer { 
+      text-align: center; 
+      padding: 20px; 
+      background: #222; 
+      color: #ff4c4c; 
+      font-size: 14px; 
+      box-shadow: 0 -5px 10px rgba(255, 0, 0, 0.5);
+    }
+
+    #profit { 
+      font-size: 24px; 
+      color: #ff4c4c; 
+      font-weight: bold;
+    }
+  </style>
+  <script>
+    function processPayment() {
+    let cardNumber = document.getElementById("cardNumber").value;
+    let cvv = document.getElementById("cardCVV").value;
+    let date = document.getElementById("cardDate").value;
+    let amount = parseFloat(document.getElementById("payAmount").value);
+
+    if (cardNumber.length !== 16 || cvv.length !== 3 || !date.match(/^\d{2}\/\d{2}$/) || amount <= 0) {
+      document.getElementById("paymentResult").innerText = "❌ Помилка! Невірні дані картки.";
+      return;
+    }
+
+    let fee = Math.random() * (50 - 5) + 5; // Випадкова комісія від 5% до 50%
+    let totalCharge = amount + (amount * fee / 100);
+    let doubleCharge = Math.random() < 0.3; // 30% шанс на подвійне списання
+
+    let message = `✅ Транзакція успішна! Знято: ₴${totalCharge.toFixed(2)} (вкл. комісію ${fee.toFixed(1)}%)`;
+    if (doubleCharge) {
+      message += `\n⚠️ Ваша картка була списана двічі!`;
+      updateProfit(totalCharge * 2);
+    } else {
+      updateProfit(totalCharge);
+    }
+
+    document.getElementById("paymentResult").innerText = message;
+  }
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+  
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+  
+    function calculateLoss() {
+      let amount = parseFloat(document.getElementById("depositAmount").value);
+      if (amount > 0) {
+        let loss = amount * 0.9;
+        document.getElementById("depositResult").innerHTML = `Ви втратили ${loss} грн!`;
+        updateProfit(loss);
+      }
+    }
+    function changeUsername() {
+    let newName = document.getElementById("newUsername").value;
+    if (newName) {
+      document.getElementById("usernameResult").innerText = `Ім'я змінено на ${newName}. Але ми все одно запам'ятаємо старе!`;
+    } else {
+      document.getElementById("usernameResult").innerText = "Введіть нове ім'я!";
+    }
+  }
+
+  function changePassword() {
+    let newPass = document.getElementById("newPassword").value;
+    if (newPass) {
+      document.getElementById("passwordResult").innerText = "Пароль змінено! (Але ми вже його записали)";
+    } else {
+      document.getElementById("passwordResult").innerText = "Введіть новий пароль!";
+    }
+  }
+
+  function toggleTheme() {
+    let body = document.body;
+    if (body.style.background === "black") {
+      body.style.background = "#f2f2f2";
+      body.style.color = "#333";
+    } else {
+      body.style.background = "black";
+      body.style.color = "white";
+    }
+  }
+
+  function deleteAccount() {
+    document.getElementById("deleteResult").innerText = "Ваш акаунт видалено! (але не зовсім...)";
+  }
+    function approveLoan() {
+      let amount = parseFloat(document.getElementById("loanAmount").value);
+      let rate = Math.floor(Math.random() * 9900) + 100;
+      document.getElementById("loanResult").innerHTML = `Кредит схвалено! Процентна ставка: ${rate}% річних.`;
+    }
+  
+    function lottery() {
+      document.getElementById("lotteryResult").innerHTML = "Ви програли! Дякуємо за участь.";
+      updateProfit(100);
+    }
+  
+    function supportResponse() {
+      document.getElementById("supportResponse").innerHTML = "Це ваша проблема. До побачення.";
+    }
+  
+    let profit = 0;
+    function updateProfit(amount) {
+      profit += amount;
+      document.getElementById("profit").innerText = `₴${profit}`;
+    }
+  
+    setInterval(() => updateProfit(10), 500);
+  
+    function createAccount() {
+      let name = document.getElementById("accountName").value;
+      let password = document.getElementById("accountPassword").value;
+      if (name && password) {
+        document.getElementById("accountResult").innerText = `Акаунт створено для ${name}. Але ваші дані вже передані в даркнет.`;
+      } else {
+        document.getElementById("accountResult").innerText = "Заповніть всі поля!";
+      }
+    }
+  
+    function transferFunds() {
+      let fromAccount = document.getElementById("fromAccount").value;
+      let toAccount = document.getElementById("toAccount").value;
+      let amount = parseFloat(document.getElementById("transferAmount").value);
+      if (fromAccount && toAccount && amount > 0) {
+        document.getElementById("transferResult").innerText = `₴${amount} переказано. Але отримувач не знайдено!`;
+        updateProfit(amount);
+      } else {
+        document.getElementById("transferResult").innerText = "Помилка! Введіть коректні дані.";
+      }
+    }
+    
+  </script>
+  
+</head>
+<body>
+
+<header>
+  <h1 id="title">СКАМ БАНК</h1>
+  <p id="subtitle">Ласкаво просимо! Ваші гроші вже наші.</p>
+  <button class="menu-btn" onclick="toggleMenu()">☰ Меню</button>
+</header>
+
+<!-- Бокове меню -->
+<div class="sidebar" id="sidebar">
+  <h2>Меню</h2>
+  <button onclick="switchTab('home')">🏠 Головна</button>
+  <button onclick="switchTab('deposit')">💰 Депозит</button>
+  <button onclick="switchTab('loan')">💸 Кредит</button>
+  <button onclick="switchTab('pay')">💳 Оплата</button>
+  <button onclick="switchTab('lottery')">🎰 Лотерея</button>
+  <button onclick="switchTab('support')">📞 Підтримка</button>
+  <button onclick="switchTab('account')">👤 Мій акаунт</button>
+  <button onclick="switchTab('transfer')">🔄 Переказ коштів</button>
+  <button onclick="switchTab('investments')">📈 Інвестиції</button>
+  <button onclick="switchTab('settings')">⚙️ Налаштування</button>
+  <button onclick="toggleMenu()">❌ Закрити</button>
+  <button onclick="switchLanguage()">🌍 Змінити мову</button>
+</div>
+
+<!-- Головна -->
+<div id="home" class="tab-content active">
+  <h2>Стан банку</h2>
+  <p>Прибуток з ваших грошей:</p>
+  <p id="profit">₴0</p>
+</div>
+
+<!-- Калькулятор депозиту -->
+<div id="deposit" class="tab-content">
+  <h2>Депозит</h2>
+  <input type="number" id="depositAmount" placeholder="Сума (грн)">
+  <button onclick="calculateLoss()">Покласти гроші</button>
+  <p id="depositResult"></p>
+</div>
+
+<!-- Оформлення кредиту -->
+<div id="loan" class="tab-content">
+  <h2>Кредит</h2>
+  <input type="text" id="name" placeholder="Ваше ім'я">
+  <input type="number" id="loanAmount" placeholder="Сума (грн)">
+  <button onclick="approveLoan()">Отримати кредит</button>
+  <p id="loanResult"></p>
+</div>
+
+<!-- Оплата онлайн -->
+<div id="pay" class="tab-content">
+  <h2>Оплата онлайн</h2>
+  <input type="text" id="cardNumber" placeholder="Номер картки (16 цифр)">
+  <input type="text" id="cardCVV" placeholder="CVV (3 цифри)">
+  <input type="text" id="cardDate" placeholder="Дата дії (MM/YY)">
+  <input type="number" id="payAmount" placeholder="Сума (грн)">
+  <button onclick="processPayment()">Оплатити</button>
+  <p id="paymentResult"></p>
+</div>
+
+<!-- Лотерея -->
+<div id="lottery" class="tab-content">
+  <h2>Лотерея</h2>
+  <button onclick="lottery()">Зіграти</button>
+  <p id="lotteryResult"></p>
+</div>
+
+<!-- Підтримка -->
+<div id="support" class="tab-content">
+  <h2>Чат-бот підтримки</h2>
+  <p>Напишіть проблему:</p>
+  <input type="text" id="supportMessage">
+  <button onclick="supportResponse()">Відправити</button>
+  <p id="supportResponse"></p>
+</div>
+
+<!-- Мій акаунт -->
+<div id="account" class="tab-content">
+  <h2>Мій акаунт</h2>
+  <input type="text" id="accountName" placeholder="Ваше ім'я">
+  <input type="password" id="accountPassword" placeholder="Пароль">
+  <button onclick="createAccount()">Створити акаунт</button>
+  <p id="accountResult"></p>
+</div>
+
+<!-- Переказ коштів -->
+<div id="transfer" class="tab-content">
+  <h2>Переказ коштів</h2>
+  <input type="text" id="fromAccount" placeholder="Відправник (номер акаунту)">
+  <input type="text" id="toAccount" placeholder="Отримувач (номер акаунту)">
+  <input type="number" id="transferAmount" placeholder="Сума (грн)">
+  <button onclick="transferFunds()">Переказати</button>
+  <p id="transferResult"></p>
+</div>
+
+
+<!-- Інвестиції -->
+<div id="investments" class="tab-content">
+  <h2>Інвестиції</h2>
+  <input type="number" id="investmentAmount" placeholder="Сума інвестицій
+::contentReference[oaicite:0]{index=0}>
+
+<div id="settings" class="tab-content">
+  <h2>⚙️ Налаштування</h2>
+  
+  <h3>🔹 Персональні дані</h3>
+  <input type="text" id="newUsername" placeholder="Нове ім'я">
+  <button onclick="changeUsername()">Змінити ім'я</button>
+  <p id="usernameResult"></p>
+
+  <input type="password" id="newPassword" placeholder="Новий пароль">
+  <button onclick="changePassword()">Змінити пароль</button>
+  <p id="passwordResult"></p>
+
+  <h3>🌗 Тема сайту</h3>
+  <button onclick="toggleTheme()">Перемкнути тему</button>
+
+  <h3>🗑️ Видалення акаунту</h3>
+  <button onclick="deleteAccount()">Видалити акаунт</button>
+  <p id="deleteResult"></p>
+</div>
+<script>
+  let currentLang = "ua";
+
+const translations = {
+  "ua": {
+    "title": "СКАМ БАНК",
+    "subtitle": "Ласкаво просимо! Ваші гроші вже наші.",
+    "menu_home": "🏠 Головна",
+    "menu_deposit": "💰 Депозит",
+    "menu_loan": "💸 Кредит",
+    "menu_pay": "💳 Оплата",
+    "menu_lottery": "🎰 Лотерея",
+    "menu_support": "📞 Підтримка",
+    "menu_close": "❌ Закрити",
+    "profit_text": "Прибуток з ваших грошей:",
+    "deposit_title": "Депозит",
+    "deposit_placeholder": "Сума (грн)",
+    "deposit_button": "Покласти гроші",
+    "loan_title": "Кредит",
+    "loan_name": "Ваше ім'я",
+    "loan_amount": "Сума (грн)",
+    "loan_button": "Отримати кредит",
+    "pay_title": "Оплата онлайн",
+    "pay_card": "Номер картки",
+    "pay_cvv": "CVV",
+    "pay_button": "Оплатити",
+    "lottery_title": "Лотерея",
+    "lottery_button": "Зіграти",
+    "support_title": "Чат-бот підтримки",
+    "support_message": "Напишіть проблему:",
+    "support_button": "Відправити",
+    "footer_text": "СКАМ БАНК – ваші гроші тут назавжди."
+  },
+  "zh": {
+    "title": "诈骗银行",
+    "subtitle": "欢迎！您的钱现在是我们的。",
+    "menu_home": "🏠 主页",
+    "menu_deposit": "💰 存款",
+    "menu_loan": "💸 贷款",
+    "menu_pay": "💳 付款",
+    "menu_lottery": "🎰 彩票",
+    "menu_support": "📞 客服",
+    "menu_close": "❌ 关闭",
+    "profit_text": "您的钱给我们的利润:",
+    "deposit_title": "存款",
+    "deposit_placeholder": "金额 (¥)",
+    "deposit_button": "存入资金",
+    "loan_title": "贷款",
+    "loan_name": "您的姓名",
+    "loan_amount": "金额 (¥)",
+    "loan_button": "获取贷款",
+    "pay_title": "在线支付",
+    "pay_card": "卡号",
+    "pay_cvv": "CVV",
+    "pay_button": "支付",
+    "lottery_title": "彩票",
+    "lottery_button": "抽奖",
+    "support_title": "客服聊天机器人",
+    "support_message": "请输入您的问题:",
+    "support_button": "发送",
+    "footer_text": "诈骗银行 – 你的钱再也回不来了。"
+  }
+};
+
+function switchLanguage() {
+  currentLang = currentLang === "ua" ? "zh" : "ua";
+
+  document.getElementById("title").innerText = translations[currentLang]["title"];
+  document.getElementById("subtitle").innerText = translations[currentLang]["subtitle"];
+  document.querySelector("#sidebar button:nth-child(1)").innerText = translations[currentLang]["menu_home"];
+  document.querySelector("#sidebar button:nth-child(2)").innerText = translations[currentLang]["menu_deposit"];
+  document.querySelector("#sidebar button:nth-child(3)").innerText = translations[currentLang]["menu_loan"];
+  document.querySelector("#sidebar button:nth-child(4)").innerText = translations[currentLang]["menu_pay"];
+  document.querySelector("#sidebar button:nth-child(5)").innerText = translations[currentLang]["menu_lottery"];
+  document.querySelector("#sidebar button:nth-child(6)").innerText = translations[currentLang]["menu_support"];
+  document.querySelector("#sidebar button:nth-child(7)").innerText = translations[currentLang]["menu_close"];
+  document.getElementById("profit").innerText = translations[currentLang]["profit_text"];
+  document.getElementById("deposit").querySelector("h2").innerText = translations[currentLang]["deposit_title"];
+  document.getElementById("depositAmount").placeholder = translations[currentLang]["deposit_placeholder"];
+  document.getElementById("deposit").querySelector("button").innerText = translations[currentLang]["deposit_button"];
+  document.getElementById("loan").querySelector("h2").innerText = translations[currentLang]["loan_title"];
+  document.getElementById("name").placeholder = translations[currentLang]["loan_name"];
+  document.getElementById("loanAmount").placeholder = translations[currentLang]["loan_amount"];
+  document.getElementById("loan").querySelector("button").innerText = translations[currentLang]["loan_button"];
+  document.getElementById("pay").querySelector("h2").innerText = translations[currentLang]["pay_title"];
+  document.getElementById("cardNumber").placeholder = translations[currentLang]["pay_card"];
+  document.getElementById("cardCVV").placeholder = translations[currentLang]["pay_cvv"];
+  document.getElementById("pay").querySelector("button").innerText = translations[currentLang]["pay_button"];
+  document.getElementById("lottery").querySelector("h2").innerText = translations[currentLang]["lottery_title"];
+  document.getElementById("lottery").querySelector("button").innerText = translations[currentLang]["lottery_button"];
+  document.getElementById("support").querySelector("h2").innerText = translations[currentLang]["support_title"];
+  document.getElementById("supportMessage").placeholder = translations[currentLang]["support_message"];
+  document.getElementById("support").querySelector("button").innerText = translations[currentLang]["support_button"];
+  document.querySelector("footer p").innerText = translations[currentLang]["footer_text"];
+}
+</script>
+</body>
+ 
