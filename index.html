@@ -113,6 +113,31 @@
       font-size: 14px; 
       box-shadow: 0 -5px 10px rgba(255, 0, 0, 0.5);
     }
+    .telegram-btn {
+    background-color: #0088cc; /* Telegram blue */
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect */
+.telegram-btn:hover {
+    background-color: #006c99; /* Darker blue when hovered */
+}
+
+/* Button focus effect */
+.telegram-btn:focus {
+    outline: none;
+}
+
+/* Link style */
+a {
+    text-decoration: none;
+}
 
     #profit { 
       font-size: 24px; 
@@ -273,6 +298,10 @@
   <h2>Стан банку</h2>
   <p>Прибуток з ваших грошей:</p>
   <p id="profit">₴0</p>
+  <p></p>
+  <a href="https://t.me/your_bot_username" target="_blank">
+    <button class="telegram-btn">Переходити до бота</button>
+</a>
 </div>
 
 <!-- Калькулятор депозиту -->
